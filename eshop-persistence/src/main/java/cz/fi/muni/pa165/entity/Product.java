@@ -30,39 +30,44 @@ import cz.fi.muni.pa165.validation.AllOrNothing;
 @Entity
 @AllOrNothing(members={"image", "imageMimeType"})
 public class Product {
-	
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	
+
 
 	@Lob
 	private byte[] image;
 
 	private String imageMimeType;
-	
 
+	@NotNull
+	@Column(nullable=false,unique=true)
 	private String name;
-	
+
 	/*
 	 * The day this item has been added to the eshop
 	 */
+	//@Temporal(TemporalType.DATE)
 	private LocalDate addedDate;
-	
+
 
 	@OneToOne
 	@JoinTable(name="CURRENT_PRICE")
 	private Price currentPrice;
-	
+
 	@OneToMany()
 	@OrderBy("priceStart DESC")
 	@JoinColumn(name="Product_FK")
 	private List<Price> priceHistory = new ArrayList<Price>();
-	
+
 	@Enumerated
 	private Color color;
 
-	
+	@ManyToMany
+	private Set<Category> categories = new HashSet<Category>();
+
+
 	public void setId(Long id){
 		this.id = id;
 	}
@@ -74,34 +79,35 @@ public class Product {
 	 * with TASK 02 you should delete this empty method
 	 * @param kitchen
 	 */
-	public void addCategory(Category kitchen) {	
+	/*
+        public void addCategory(Category kitchen) {
 	}
 	public List<Product> getCategories() {
 		return null;
 	}
+        */
 	//TODO after you are done with task02 you can uncomment this methods
-//	public void removeCategory(Category category)	{
-//		this.categories.remove(category);
-//	}
-//	
-//	public void addCategory(Category c) {
-//		categories.add(c);
-//		c.addProduct(this);
-//	}
-//
-//	public Set<Category> getCategories() {
-//		return Collections.unmodifiableSet(categories);
-//	}
+	public void removeCategory(Category category)	{
+		this.categories.remove(category);
+	}
+
+	public void addCategory(Category c) {
+		categories.add(c);
+		c.addProduct(this);
+	}
+
+	public Set<Category> getCategories() {
+		return Collections.unmodifiableSet(categories);
+	}
+
 
 
 	public LocalDate getAddedDate() {
 		return addedDate;
 	}
-
 	public void setAddedDate(LocalDate addedDate) {
 		this.addedDate = addedDate;
 	}
-
 	public Product(Long productId) {
 		this.id = productId;
 	}
@@ -110,7 +116,7 @@ public class Product {
 	public byte[] getImage() {
 		return image;
 	}
-	
+
 
 	public String getImageMimeType() {
 		return imageMimeType;
@@ -132,7 +138,7 @@ public class Product {
 	public void addHistoricalPrice(Price p){
 		priceHistory.add(p);
 	}
-	
+
 	public void setCurrentPrice(Price currentPrice) {
 		this.currentPrice = currentPrice;
 	}
@@ -196,7 +202,7 @@ public class Product {
 
 
 
-	
-	
-	
+
+
+
 }
